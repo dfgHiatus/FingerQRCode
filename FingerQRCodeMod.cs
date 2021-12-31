@@ -30,30 +30,25 @@ namespace FingerQRCode
         public class FingerQRPatch
         {
             // asset provides the Uri of the photo we took with the finger photo
-            public static void Postfix(Slot rootSpace, int2 resolution, bool addTemporaryHolder, 
-                ref Task __result, PhotoCaptureManager __instance)
+            public static bool Prefix(Slot rootSpace, int2 resolution, bool addTemporaryHolder, 
+                ref Task __result, PhotoCaptureManager __instance, 
+                ref float ___flash, Sync<Camera> ___camera, SyncRef<QuadMesh> ___quad, SyncRef<Slot> ___previewRoot)
             {
 
-                // Reflection magic
-                float _flash = (float)AccessTools.Field(__instance.GetType(), "_flash").GetValue(__instance);
-                Sync<Camera> __camera = (Sync<Camera>)AccessTools.Field(__instance.GetType(), "_camera").GetValue(__instance);
-                SyncRef<QuadMesh> __quad = (SyncRef<QuadMesh>)AccessTools.Field(__instance.GetType(), "_quad").GetValue(__instance);
-                SyncRef<Slot> __previewRoot = (SyncRef<Slot>)AccessTools.Field(__instance.GetType(), "_previewRoot").GetValue(__instance);
-
-                _flash = 1f;
+                ___flash = 1f;
                 __instance.PlayCaptureSound();
-                Sync<float> fov = __camera.Value.FieldOfView;
-                float2 float2 = __quad.Target.Size;
-                float3 position = __previewRoot.Target.GlobalPosition;
-                floatQ rotation = __previewRoot.Target.GlobalRotation;
-                float3 globalScale = __previewRoot.Target.GlobalScale;
+                Sync<float> fov = ___camera.Value.FieldOfView;
+                float2 float2 = ___quad.Target.Size;
+                float3 position = ___previewRoot.Target.GlobalPosition;
+                floatQ rotation = ___previewRoot.Target.GlobalRotation;
+                float3 globalScale = ___previewRoot.Target.GlobalScale;
                 float3 scale = globalScale * (float2.x / float2.Normalized.x);
                 position = rootSpace.GlobalPointToLocal(in position);
                 rotation = rootSpace.GlobalRotationToLocal(in rotation);
                 scale = rootSpace.GlobalScaleToLocal(in scale);
                 __result = __instance.StartTask((Func<Task>)(async () =>
                 {
-                    RenderSettings renderSettings = __camera.Value.GetRenderSettings(resolution);
+                    RenderSettings renderSettings = ___camera.Value.GetRenderSettings(resolution);
                     if (renderSettings.excludeObjects == null)
                         renderSettings.excludeObjects = new List<Slot>();
                     CommonTool.GetLaserRoots((IEnumerable<User>)__instance.World.AllUsers, renderSettings.excludeObjects);
@@ -150,6 +145,8 @@ namespace FingerQRCode
                     Debug("END URI DECODE PROCESS");
                     Debug("");
                 }));
+
+                return false;
             }
         }
     }
