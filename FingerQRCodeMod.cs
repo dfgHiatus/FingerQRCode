@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Drawing;
 using System.Threading.Tasks;
 using FrooxEngine;
+using BaseX;
 using HarmonyLib;
 using NeosModLoader;
+using ZXing;
+using System.Net;
 
 namespace FingerQRCode
 {
@@ -25,9 +27,44 @@ namespace FingerQRCode
         [HarmonyPatch(typeof(PhotoCaptureManager), "TakePhoto")]
         public class FingerQRPatch
         {
-            public static void Prefix()
+            // asset provides the Uri of the photo we took with the finger photo
+            public static bool Postfix(Uri asset)
             {
+                IBarcodeReader reader = new BarcodeReader();
+                WebClient client = new WebClient();
+                var image = Image.FromStream(client.OpenRead(asset));
 
+                Bitmap barcodeBitmap = new Bitmap(image);
+
+                if (barcodeBitmap != null)
+                {
+                    var result = reader.Decode(barcodeBitmap);
+
+                    if (result != null)
+                    {
+                        try
+                        { 
+                            if (Uri.IsWellFormedUriString(result.BarcodeFormat.ToString(), UriKind.RelativeOrAbsolute))
+                            {
+                                Uri qrCodeUri = new Uri(result.BarcodeFormat.ToString());
+                                Slot slot = Userspace.UserspaceWorld.AddSlot("Hyperlink Dialog");
+                                slot.AttachComponent<HyperlinkOpenDialog>().Setup(qrCodeUri, "Finger Photo QR Code");
+                                slot.PositionInFrontOfUser(new float3?(float3.Backward));
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            return true;
+                        }
+                        finally
+                        {
+                            client.Dispose();
+                        }  
+                    }
+                }
+
+                return true;
             }
         }
+    }
 }
