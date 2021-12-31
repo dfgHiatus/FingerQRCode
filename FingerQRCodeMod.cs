@@ -8,6 +8,7 @@ using HarmonyLib;
 using NeosModLoader;
 using ZXing;
 using System.Net;
+using System.Reflection;
 
 namespace FingerQRCode
 {
@@ -30,28 +31,34 @@ namespace FingerQRCode
         {
             // asset provides the Uri of the photo we took with the finger photo
             public static void Postfix(Slot rootSpace, int2 resolution, bool addTemporaryHolder, 
-                float _flash, Camera _camera, Quad _quad, World _World, 
-                Slot _previewRoot, ref Task __result, PhotoCaptureManager _self)
+                ref Task __result, PhotoCaptureManager __instance)
             {
+
+                // Reflection magic
+                float _flash = (float)AccessTools.Field(__instance.GetType(), "_flash").GetValue(__instance);
+                Sync<Camera> __camera = (Sync<Camera>)AccessTools.Field(__instance.GetType(), "_camera").GetValue(__instance);
+                SyncRef<QuadMesh> __quad = (SyncRef<QuadMesh>)AccessTools.Field(__instance.GetType(), "_quad").GetValue(__instance);
+                SyncRef<Slot> __previewRoot = (SyncRef<Slot>)AccessTools.Field(__instance.GetType(), "_previewRoot").GetValue(__instance);
+
                 _flash = 1f;
-                _self.PlayCaptureSound();
-                Sync<float> fov = _camera.FieldOfView;
-                float2 float2 = _quad.Size;
-                float3 position = _previewRoot.GlobalPosition;
-                floatQ rotation = _previewRoot.GlobalRotation;
-                float3 globalScale = _previewRoot.GlobalScale;
+                __instance.PlayCaptureSound();
+                Sync<float> fov = __camera.Value.FieldOfView;
+                float2 float2 = __quad.Target.Size;
+                float3 position = __previewRoot.Target.GlobalPosition;
+                floatQ rotation = __previewRoot.Target.GlobalRotation;
+                float3 globalScale = __previewRoot.Target.GlobalScale;
                 float3 scale = globalScale * (float2.x / float2.Normalized.x);
                 position = rootSpace.GlobalPointToLocal(in position);
                 rotation = rootSpace.GlobalRotationToLocal(in rotation);
                 scale = rootSpace.GlobalScaleToLocal(in scale);
-                __result = _self.StartTask((Func<Task>)(async () =>
+                __result = __instance.StartTask((Func<Task>)(async () =>
                 {
-                    RenderSettings renderSettings = _camera.GetRenderSettings(resolution);
+                    RenderSettings renderSettings = __camera.Value.GetRenderSettings(resolution);
                     if (renderSettings.excludeObjects == null)
                         renderSettings.excludeObjects = new List<Slot>();
-                    CommonTool.GetLaserRoots((IEnumerable<User>)_World.AllUsers, renderSettings.excludeObjects);
-                    Uri asset = await _World.Render.RenderToAsset(renderSettings);
-                    bool canSpawn = _World.CanSpawnObjects();
+                    CommonTool.GetLaserRoots((IEnumerable<User>)__instance.World.AllUsers, renderSettings.excludeObjects);
+                    Uri asset = await __instance.World.Render.RenderToAsset(renderSettings);
+                    bool canSpawn = __instance.World.CanSpawnObjects();
                     if (addTemporaryHolder & canSpawn)
                     {
                         rootSpace = rootSpace.AddSlot("Temporary Holder");
@@ -65,14 +72,14 @@ namespace FingerQRCode
                     }
                     else
                     {
-                        s = _self.LocalUserRoot.Slot.AddLocalSlot("Photo", true);
+                        s = __instance.LocalUserRoot.Slot.AddLocalSlot("Photo", true);
                         s.LocalPosition = new float3(y: -10000f);
                     }
                     StaticTexture2D staticTexture2D = s.AttachTexture(asset, wrapMode: TextureWrapMode.Clamp);
                     ImageImporter.SetupTextureProxyComponents(s, (IAssetProvider<Texture2D>)staticTexture2D, StereoLayout.None, ImageProjection.Perspective, true);
                     PhotoMetadata componentInChildren = s.GetComponentInChildren<PhotoMetadata>();
                     componentInChildren.CameraManufacturer.Value = "Neos";
-                    componentInChildren.CameraModel.Value = _self.GetType().Name;
+                    componentInChildren.CameraModel.Value = __instance.GetType().Name;
                     componentInChildren.CameraFOV.Value = (float)fov;
                     s.AttachComponent<Grabbable>().Scalable.Value = true;
                     AttachedModel<QuadMesh, UnlitMaterial> attachedModel = s.AttachMesh<QuadMesh, UnlitMaterial>();
