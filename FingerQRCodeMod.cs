@@ -30,6 +30,9 @@ namespace FingerQRCode
             // asset provides the Uri of the photo we took with the finger photo
             public static bool Postfix(Uri asset)
             {
+                Debug("");
+                Debug("BEGIN URI DECODE PROCESS");
+                Debug("");
                 IBarcodeReader reader = new BarcodeReader();
                 WebClient client = new WebClient();
                 var image = Image.FromStream(client.OpenRead(asset));
@@ -46,6 +49,8 @@ namespace FingerQRCode
                         { 
                             if (Uri.IsWellFormedUriString(result.BarcodeFormat.ToString(), UriKind.RelativeOrAbsolute))
                             {
+                                Debug("Payload detected: " + result.BarcodeFormat.ToString());
+                                Debug("");
                                 Uri qrCodeUri = new Uri(result.BarcodeFormat.ToString());
                                 Slot slot = Userspace.UserspaceWorld.AddSlot("Hyperlink Dialog");
                                 slot.AttachComponent<HyperlinkOpenDialog>().Setup(qrCodeUri, "Finger Photo QR Code");
@@ -54,6 +59,7 @@ namespace FingerQRCode
                         }
                         catch(Exception e)
                         {
+                            Warn(e.ToString());
                             return true;
                         }
                         finally
@@ -62,6 +68,9 @@ namespace FingerQRCode
                         }  
                     }
                 }
+
+                Debug("END URI DECODE PROCESS");
+                Debug("");
 
                 return true;
             }
