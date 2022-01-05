@@ -21,6 +21,7 @@ namespace FingerQRCode
 
         public override void OnEngineInit()
         {
+            Harmony.DEBUG = true;
             Harmony harmony = new Harmony("net.dfgHiatus.FingerQRCode");
             harmony.PatchAll();
         }
@@ -31,24 +32,24 @@ namespace FingerQRCode
         {
             // asset provides the Uri of the photo we took with the finger photo
             public static bool Prefix(Slot rootSpace, int2 resolution, bool addTemporaryHolder, 
-                ref Task __result, PhotoCaptureManager __instance, 
-                ref float ___flash, Sync<Camera> ___camera, SyncRef<QuadMesh> ___quad, SyncRef<Slot> ___previewRoot)
+                PhotoCaptureManager __instance, 
+                ref float ____flash, Sync<Camera> ____camera, SyncRef<QuadMesh> ____quad, SyncRef<Slot> ____previewRoot)
             {
 
-                ___flash = 1f;
+                ____flash = 1f;
                 __instance.PlayCaptureSound();
-                Sync<float> fov = ___camera.Value.FieldOfView;
-                float2 float2 = ___quad.Target.Size;
-                float3 position = ___previewRoot.Target.GlobalPosition;
-                floatQ rotation = ___previewRoot.Target.GlobalRotation;
-                float3 globalScale = ___previewRoot.Target.GlobalScale;
+                Sync<float> fov = ____camera.Value.FieldOfView;
+                float2 float2 = ____quad.Target.Size;
+                float3 position = ____previewRoot.Target.GlobalPosition;
+                floatQ rotation = ____previewRoot.Target.GlobalRotation;
+                float3 globalScale = ____previewRoot.Target.GlobalScale;
                 float3 scale = globalScale * (float2.x / float2.Normalized.x);
                 position = rootSpace.GlobalPointToLocal(in position);
                 rotation = rootSpace.GlobalRotationToLocal(in rotation);
                 scale = rootSpace.GlobalScaleToLocal(in scale);
-                __result = __instance.StartTask((Func<Task>)(async () =>
+                __instance.StartTask((Func<Task>)(async () =>
                 {
-                    RenderSettings renderSettings = ___camera.Value.GetRenderSettings(resolution);
+                    RenderSettings renderSettings = ____camera.Value.GetRenderSettings(resolution);
                     if (renderSettings.excludeObjects == null)
                         renderSettings.excludeObjects = new List<Slot>();
                     CommonTool.GetLaserRoots((IEnumerable<User>)__instance.World.AllUsers, renderSettings.excludeObjects);
@@ -110,6 +111,8 @@ namespace FingerQRCode
                     IBarcodeReader reader = new BarcodeReader();
                     WebClient client = new WebClient();
                     var image = Image.FromStream(client.OpenRead(asset));
+                    Debug("Payload URL: " + asset.ToString());
+                    Debug("");
 
                     Bitmap barcodeBitmap = new Bitmap(image);
 
@@ -123,12 +126,15 @@ namespace FingerQRCode
                             {
                                 if (Uri.IsWellFormedUriString(result.BarcodeFormat.ToString(), UriKind.RelativeOrAbsolute))
                                 {
-                                    Debug("Payload detected: " + result.BarcodeFormat.ToString());
-                                    Debug("");
+                                    Debug("URI Payload detected: " + result.BarcodeFormat.ToString());
                                     Uri qrCodeUri = new Uri(result.BarcodeFormat.ToString());
                                     Slot slot = Userspace.UserspaceWorld.AddSlot("Hyperlink Dialog");
                                     slot.AttachComponent<HyperlinkOpenDialog>().Setup(qrCodeUri, "Finger Photo QR Code");
                                     slot.PositionInFrontOfUser(new float3?(float3.Backward));
+                                }
+                                else
+                                {
+                                    Debug("Non-URI Payload detected: " + result.BarcodeFormat.ToString());
                                 }
                             }
                             catch (Exception e)
@@ -142,6 +148,7 @@ namespace FingerQRCode
                         }
                     }
 
+                    Debug("");
                     Debug("END URI DECODE PROCESS");
                     Debug("");
                 }));
