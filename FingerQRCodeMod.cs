@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using FrooxEngine;
 using BaseX;
 using HarmonyLib;
 using NeosModLoader;
-using ZXing;
-using System.Net;
 using System.IO;
 using CodeX;
+using MessagingToolkit.QRCode.Codec;
+using MessagingToolkit.QRCode.Codec.Data;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace FingerQRCode
 {
@@ -37,32 +37,25 @@ namespace FingerQRCode
                 PhotoCaptureManager __instance,
                 ref float ____flash, SyncRef<Camera> ____camera, SyncRef<QuadMesh> ____quad, SyncRef<Slot> ____previewRoot)
             {
-                Debug("Take Photo");
                 // SyncRef<Camera> ____camera = Traverse.Create(__instance).Field("_camera").GetValue() as SyncRef<Camera>;
                 // SyncRef<QuadMesh> ____quad = Traverse.Create(__instance).Field("_quad").GetValue() as SyncRef<QuadMesh>;
                 // SyncRef<Slot> ____previewRoot = Traverse.Create(__instance).Field("_previewRoot").GetValue() as SyncRef<Slot>;
+                // Traverse.Create(__instance).Field("_flash").SetValue(1f);
 
-                ____flash = 1f; // Traverse.Create(__instance).Field("_flash").SetValue(1f); //
+                ____flash = 1f; 
                 __instance.PlayCaptureSound();
-                Debug("Sound Played");
-                Debug(____camera);
-                Debug(____camera.Target.FieldOfView);
                 Sync<float> fov = ____camera.Target.FieldOfView;
-                Debug("FOV");
                 float2 quadSize = ____quad.Target.Size;
-                Debug("Transforms Stored");
                 float3 position = ____previewRoot.Target.GlobalPosition;
                 floatQ rotation = ____previewRoot.Target.GlobalRotation;
                 float3 globalScale = ____previewRoot.Target.GlobalScale;
                 float3 scale = globalScale * (quadSize.x / quadSize.Normalized.x);
-                Debug("Transforms Stored");
                 position = rootSpace.GlobalPointToLocal(in position);
                 rotation = rootSpace.GlobalRotationToLocal(in rotation);
                 scale = rootSpace.GlobalScaleToLocal(in scale);
-                Debug("Before Task");
+
                 __instance.StartTask((Func<Task>)(async () =>
                 {
-                    Debug("Start Task");
                     RenderSettings renderSettings = ____camera.Target.GetRenderSettings(resolution);
                     if (renderSettings.excludeObjects == null)
                         renderSettings.excludeObjects = new List<Slot>();
@@ -85,7 +78,6 @@ namespace FingerQRCode
                         s = __instance.LocalUserRoot.Slot.AddLocalSlot("Photo", true);
                         s.LocalPosition = new float3(y: -10000f);
                     }
-                    Debug("Slots Generated");
                     StaticTexture2D staticTexture2D = s.AttachTexture(asset, wrapMode: TextureWrapMode.Clamp);
                     ImageImporter.SetupTextureProxyComponents(s, (IAssetProvider<Texture2D>)staticTexture2D, StereoLayout.None, ImageProjection.Perspective, true);
                     PhotoMetadata componentInChildren = s.GetComponentInChildren<PhotoMetadata>();
@@ -123,57 +115,68 @@ namespace FingerQRCode
                     Debug("");
                     Debug("BEGIN URI DECODE PROCESS");
                     Debug("");
-                    Debug("Payload URL: " + asset.ToString());
-                    Debug("");
+                    Debug("Local URL: " + asset.ToString());
 
-                    IBarcodeReader reader = new BarcodeReader();
+                    LocalDB localDB = __instance.World.Engine.LocalDB;
 
                     // local://u03evnzmzkijq3353zc__g/_DBzvWshEEapMpdmSNsEPg.webp
-                    LocalDB localDB = __instance.World.Engine.LocalDB;  
                     string linkString = asset.ToString();
-                    
-                    linkString = localDB.AssetStoragePath +"/"+Path.GetFileName(linkString);//linkString.Replace("local://" + localDB.MachineID.ToString(), localDB.AssetStoragePath);
+
+                    // %appdata..._DBzvWshEEapMpdmSNsEPg.webp
+                    linkString = localDB.AssetStoragePath +"/"+Path.GetFileName(linkString);
                     
                     string tempFilePath1 = localDB.GetTempFilePath("png");
                     TextureEncoder.ConvertToPNG(linkString, tempFilePath1);
-                    Debug(tempFilePath1);
-                    
-                    System.Drawing.Bitmap barcodeBitmap = (System.Drawing.Bitmap) Image.FromFile(tempFilePath1);
+                    // %appdata..._DBzvWshEEapMpdmSNsEPg.png
 
-                    Debug(barcodeBitmap.Size.Width);
-                    Debug(barcodeBitmap.Size.Height);
-
-                    if (barcodeBitmap != null)
+                    if (File.Exists(tempFilePath1))
                     {
-                        var result = reader.Decode(barcodeBitmap);
+                        QRCodeDecoder decoder = new QRCodeDecoder();
+                        string QRString = null;
 
-                        if (result != null)
+                        try
                         {
-                            try
+                            QRString = decoder.Decode(new QRCodeBitmapImage(Image.FromFile(tempFilePath1) as System.Drawing.Bitmap));
+                        }
+                        catch (Exception e)
+                        {
+                            Warn("Error in URI decode: " + e.Message);
+                        }
+
+                        Debug("Raw Content: " + QRString);
+
+                        // Need two copies of the end due to RunSync
+                        if (QRString != null) 
+                        {
+                            if (Uri.IsWellFormedUriString(QRString, UriKind.RelativeOrAbsolute))
                             {
-                                if (Uri.IsWellFormedUriString(result.BarcodeFormat.ToString(), UriKind.RelativeOrAbsolute))
+                                Userspace.UserspaceWorld.RunSynchronously( delegate
                                 {
-                                    Debug("URI Payload detected: " + result.BarcodeFormat.ToString());
-                                    Uri qrCodeUri = new Uri(result.BarcodeFormat.ToString());
+                                    Debug("URI Payload detected.");
                                     Slot slot = Userspace.UserspaceWorld.AddSlot("Hyperlink Dialog");
-                                    slot.AttachComponent<HyperlinkOpenDialog>().Setup(qrCodeUri, "Finger Photo QR Code");
+                                    slot.AttachComponent<HyperlinkOpenDialog>().Setup(new Uri(QRString), "Finger Photo QR Code");
                                     slot.PositionInFrontOfUser(new float3?(float3.Backward));
-                                }
-                                else
-                                {
-                                    Debug("Non-URI Payload detected: " + result.BarcodeFormat.ToString());
-                                }
+                                    QRString = null;
+                                    Debug("");
+                                    Debug("END URI DECODE PROCESS");
+                                    Debug("");
+                                });
                             }
-                            catch (Exception e)
+                            else
                             {
-                                Warn(e.ToString());
+                                Debug("Non-URI Payload detected. Copying to clipboard");
+                                Clipboard.SetText(QRString);
+                                QRString = null;
+                                Debug("");
+                                Debug("END URI DECODE PROCESS");
+                                Debug("");
                             }
                         }
+                        else
+                        {
+                            Warn("Error in Payload decode");
+                        }
                     }
-
-                    Debug("");
-                    Debug("END URI DECODE PROCESS");
-                    Debug("");
                 }));
 
                 return false;

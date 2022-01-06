@@ -34,14 +34,59 @@
     <Reference Include="0Harmony">
       <HintPath>G:\Steam\steamapps\common\NeosVR\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="Babel.Licensing, Version=2.8.8.0, Culture=neutral, PublicKeyToken=138d17b5bd621ab7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\Babel.Licensing.dll</HintPath>
+    </Reference>
     <Reference Include="BaseX">
       <HintPath>G:\Steam\steamapps\common\NeosVR\Neos_Data\Managed\BaseX.dll</HintPath>
+    </Reference>
+    <Reference Include="BitMiracle.LibTiff.NET, Version=2.4.638.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\BitMiracle.LibTiff.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.10.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="CodeX">
       <HintPath>G:\Steam\steamapps\common\NeosVR\Neos_Data\Managed\CodeX.dll</HintPath>
     </Reference>
+    <Reference Include="DotNetZip, Version=1.15.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="FrooxEngine">
       <HintPath>G:\Steam\steamapps\common\NeosVR\Neos_Data\Managed\FrooxEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="IronBarCode, Version=2021.12.0.21, Culture=neutral, PublicKeyToken=b971bb3971bdf306, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronBarCode.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPdf.Pdfium, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronPdf.Pdfium.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPdf.Pdfium.Domain, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=94e1c31412563c75, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronPdf.Pdfium.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="IronSoftware.Analytics, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronSoftware.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="IronSoftware.Common, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronSoftware.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="IronSoftware.Deployment, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronSoftware.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="IronSoftware.IronConfigurationManager, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronSoftware.IronConfigurationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="IronSoftware.Licenses, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronSoftware.Licenses.dll</HintPath>
+    </Reference>
+    <Reference Include="IronSoftware.Logger, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronSoftware.Logger.dll</HintPath>
+    </Reference>
+    <Reference Include="IronSoftware.Standard.Aforge, Version=1.0.0.4471, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\IronSoftware.Standard.Aforge.dll</HintPath>
+    </Reference>
+    <Reference Include="MessagingToolkit.QRCode, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MessagingToolkit.QRCode.1.3.0\lib\MessagingToolkit.QRCode.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Registry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Win32.Registry.5.0.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
@@ -52,8 +97,17 @@
     <Reference Include="Microsoft.Win32.SystemEvents, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Win32.SystemEvents.6.0.0\lib\net461\Microsoft.Win32.SystemEvents.dll</HintPath>
     </Reference>
+    <Reference Include="NativeLibraryLoader, Version=1.0.12.0, Culture=neutral, PublicKeyToken=212d70e9efeae4c7, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\NativeLibraryLoader.dll</HintPath>
+    </Reference>
     <Reference Include="NeosModLoader">
       <HintPath>G:\Steam\steamapps\common\NeosVR\Libraries\NeosModLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=94e1c31412563c75, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\PdfSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -196,10 +250,12 @@
       <HintPath>packages\System.Threading.AccessControl.6.0.0\lib\net461\System.Threading.AccessControl.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Web.Services.Description, Version=4.9.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Web.Services.Description.4.9.0\lib\net461\System.Web.Services.Description.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -207,11 +263,11 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="zxing, Version=0.16.7.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
-      <HintPath>packages\ZXing.Net.0.16.7\lib\net47\zxing.dll</HintPath>
+    <Reference Include="zxing, Version=0.16.6.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\zxing.dll</HintPath>
     </Reference>
-    <Reference Include="zxing.presentation, Version=0.16.7.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
-      <HintPath>packages\ZXing.Net.0.16.7\lib\net47\zxing.presentation.dll</HintPath>
+    <Reference Include="zxing.presentation, Version=0.16.6.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>packages\BarCode.2021.12.21\lib\net40\zxing.presentation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
