@@ -1,16 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FrooxEngine;
-using BaseX;
-using HarmonyLib;
-using NeosModLoader;
-using System.IO;
-using CodeX;
-using MessagingToolkit.QRCode.Codec;
-using MessagingToolkit.QRCode.Codec.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using FrooxEngine;
+using BaseX;
+using CodeX;
+using HarmonyLib;
+using NeosModLoader;
+using MessagingToolkit.QRCode.Codec;
+using MessagingToolkit.QRCode.Codec.Data;
 
 namespace FingerQRCode
 {
@@ -23,16 +23,13 @@ namespace FingerQRCode
 
         public override void OnEngineInit()
         {
-            Harmony.DEBUG = true;
             Harmony harmony = new Harmony("net.dfgHiatus.FingerQRCode");
             harmony.PatchAll();
         }
 
-        // this is a private method
         [HarmonyPatch(typeof(PhotoCaptureManager), "TakePhoto")]
         public class FingerQRPatch
         {
-            // asset provides the Uri of the photo we took with the finger photo
             public static bool Prefix(Slot rootSpace, int2 resolution, bool addTemporaryHolder, 
                 PhotoCaptureManager __instance,
                 ref float ____flash, SyncRef<Camera> ____camera, SyncRef<QuadMesh> ____quad, SyncRef<Slot> ____previewRoot)
@@ -145,7 +142,7 @@ namespace FingerQRCode
 
                         Debug("Raw Content: " + QRString);
 
-                        // Need two copies of the end due to RunSync
+                        // Need two copies due to RunSync
                         if (QRString != null) 
                         {
                             if (Uri.IsWellFormedUriString(QRString, UriKind.RelativeOrAbsolute))
@@ -166,6 +163,10 @@ namespace FingerQRCode
                             {
                                 Debug("Non-URI Payload detected. Copying to clipboard");
                                 Clipboard.SetText(QRString);
+                                float3 pos = float3.Zero;
+                                floatQ rot = floatQ.Identity;
+                                __instance.LocalUser.GetPointInFrontOfUser(out pos, out rot, null, new float3(0, 0, -0.1f));
+                                NotificationMessage.SpawnTextMessage(__instance.World, pos, QRString, color.Orange);
                                 QRString = null;
                                 Debug("");
                                 Debug("END URI DECODE PROCESS");
