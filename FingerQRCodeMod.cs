@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using FrooxEngine;
 using BaseX;
@@ -8,7 +9,8 @@ using HarmonyLib;
 using NeosModLoader;
 using ZXing;
 using System.Net;
-using System.Reflection;
+using System.IO;
+using CodeX;
 
 namespace FingerQRCode
 {
@@ -32,24 +34,36 @@ namespace FingerQRCode
         {
             // asset provides the Uri of the photo we took with the finger photo
             public static bool Prefix(Slot rootSpace, int2 resolution, bool addTemporaryHolder, 
-                PhotoCaptureManager __instance, 
-                ref float ____flash, Sync<Camera> ____camera, SyncRef<QuadMesh> ____quad, SyncRef<Slot> ____previewRoot)
+                PhotoCaptureManager __instance,
+                ref float ____flash, SyncRef<Camera> ____camera, SyncRef<QuadMesh> ____quad, SyncRef<Slot> ____previewRoot)
             {
+                Debug("Take Photo");
+                // SyncRef<Camera> ____camera = Traverse.Create(__instance).Field("_camera").GetValue() as SyncRef<Camera>;
+                // SyncRef<QuadMesh> ____quad = Traverse.Create(__instance).Field("_quad").GetValue() as SyncRef<QuadMesh>;
+                // SyncRef<Slot> ____previewRoot = Traverse.Create(__instance).Field("_previewRoot").GetValue() as SyncRef<Slot>;
 
-                ____flash = 1f;
+                ____flash = 1f; // Traverse.Create(__instance).Field("_flash").SetValue(1f); //
                 __instance.PlayCaptureSound();
-                Sync<float> fov = ____camera.Value.FieldOfView;
-                float2 float2 = ____quad.Target.Size;
+                Debug("Sound Played");
+                Debug(____camera);
+                Debug(____camera.Target.FieldOfView);
+                Sync<float> fov = ____camera.Target.FieldOfView;
+                Debug("FOV");
+                float2 quadSize = ____quad.Target.Size;
+                Debug("Transforms Stored");
                 float3 position = ____previewRoot.Target.GlobalPosition;
                 floatQ rotation = ____previewRoot.Target.GlobalRotation;
                 float3 globalScale = ____previewRoot.Target.GlobalScale;
-                float3 scale = globalScale * (float2.x / float2.Normalized.x);
+                float3 scale = globalScale * (quadSize.x / quadSize.Normalized.x);
+                Debug("Transforms Stored");
                 position = rootSpace.GlobalPointToLocal(in position);
                 rotation = rootSpace.GlobalRotationToLocal(in rotation);
                 scale = rootSpace.GlobalScaleToLocal(in scale);
+                Debug("Before Task");
                 __instance.StartTask((Func<Task>)(async () =>
                 {
-                    RenderSettings renderSettings = ____camera.Value.GetRenderSettings(resolution);
+                    Debug("Start Task");
+                    RenderSettings renderSettings = ____camera.Target.GetRenderSettings(resolution);
                     if (renderSettings.excludeObjects == null)
                         renderSettings.excludeObjects = new List<Slot>();
                     CommonTool.GetLaserRoots((IEnumerable<User>)__instance.World.AllUsers, renderSettings.excludeObjects);
@@ -71,6 +85,7 @@ namespace FingerQRCode
                         s = __instance.LocalUserRoot.Slot.AddLocalSlot("Photo", true);
                         s.LocalPosition = new float3(y: -10000f);
                     }
+                    Debug("Slots Generated");
                     StaticTexture2D staticTexture2D = s.AttachTexture(asset, wrapMode: TextureWrapMode.Clamp);
                     ImageImporter.SetupTextureProxyComponents(s, (IAssetProvider<Texture2D>)staticTexture2D, StereoLayout.None, ImageProjection.Perspective, true);
                     PhotoMetadata componentInChildren = s.GetComponentInChildren<PhotoMetadata>();
@@ -108,13 +123,25 @@ namespace FingerQRCode
                     Debug("");
                     Debug("BEGIN URI DECODE PROCESS");
                     Debug("");
-                    IBarcodeReader reader = new BarcodeReader();
-                    WebClient client = new WebClient();
-                    var image = Image.FromStream(client.OpenRead(asset));
                     Debug("Payload URL: " + asset.ToString());
                     Debug("");
 
-                    Bitmap barcodeBitmap = new Bitmap(image);
+                    IBarcodeReader reader = new BarcodeReader();
+
+                    // local://u03evnzmzkijq3353zc__g/_DBzvWshEEapMpdmSNsEPg.webp
+                    LocalDB localDB = __instance.World.Engine.LocalDB;  
+                    string linkString = asset.ToString();
+                    
+                    linkString = localDB.AssetStoragePath +"/"+Path.GetFileName(linkString);//linkString.Replace("local://" + localDB.MachineID.ToString(), localDB.AssetStoragePath);
+                    
+                    string tempFilePath1 = localDB.GetTempFilePath("png");
+                    TextureEncoder.ConvertToPNG(linkString, tempFilePath1);
+                    Debug(tempFilePath1);
+                    
+                    System.Drawing.Bitmap barcodeBitmap = (System.Drawing.Bitmap) Image.FromFile(tempFilePath1);
+
+                    Debug(barcodeBitmap.Size.Width);
+                    Debug(barcodeBitmap.Size.Height);
 
                     if (barcodeBitmap != null)
                     {
@@ -140,10 +167,6 @@ namespace FingerQRCode
                             catch (Exception e)
                             {
                                 Warn(e.ToString());
-                            }
-                            finally
-                            {
-                                client.Dispose();
                             }
                         }
                     }
