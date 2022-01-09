@@ -11,3 +11,5 @@ A mod to extend URL-QR Code reader functionality to NeosVR's finger photo gestur
 - Finger photos now take more time to process, on average 5 or 6 seconds 
 - For the best QR reading, stand 2-3 meters away from the QR code when scanning, with the image as flat as possible for the camera. The QR code should take up no more than 1/3 of your picture, and be well-lit enough to read.
 - Currently does not work with non-URL payloads
+- Longer URL's (>25 characters, this number is flexible) are typically harder to decode
+- QR Code ECC Level (M, L, Q, etc.) does not apear to change the readability of the QR Code. Keep this at L unless needs be
