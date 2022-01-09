@@ -4,7 +4,7 @@ A mod to extend QR Code reader functionality to NeosVR's finger photo gesture
 
 ## Installation
 1. Install [NeosModLoader](https://github.com/zkxs/NeosModLoader).
-2. Place [FingerPhotoQR.dll] into your `nml_mods` folder, and [MessagingToolkit.QRCode.dll] into your Neos base directory (the folder above `nml_mods`). This folder should be at `C:\Program Files (x86)\Steam\steamapps\common\NeosVR\nml_mods` for a default install. You can create it if it's missing, or if you launch the game once with NeosModLoader installed it will create the folder for you.
+2. Place FingerPhotoQR.dll into your `nml_mods` folder, and MessagingToolkit.QRCode.dll into your Neos base directory (the folder above `nml_mods`). This folder should be at `C:\Program Files (x86)\Steam\steamapps\common\NeosVR\nml_mods` for a default install. You can create it if it's missing, or if you launch the game once with NeosModLoader installed it will create the folder for you.
 3. Start the game. If you want to verify that the mod is working you can check your Neos logs.
 
 ## Notes: 
