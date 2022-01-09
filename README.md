@@ -1,6 +1,6 @@
 # FingerQRCode
 ![Screenshot](https://github.com/dfgHiatus/FingerQRCode/blob/master/QRCode.PNG)
-A mod to extend QR Code reader functionality to NeosVR's finger photo gesture
+A mod to extend URL-QR Code reader functionality to NeosVR's finger photo gesture.
 
 ## Installation
 1. Install [NeosModLoader](https://github.com/zkxs/NeosModLoader).
@@ -10,3 +10,4 @@ A mod to extend QR Code reader functionality to NeosVR's finger photo gesture
 ## Notes: 
 - Finger photos now take more time to process, on average 5 or 6 seconds 
 - For the best QR reading, stand 2-3 meters away from the QR code when scanning, with the image as flat as possible for the camera. The QR code should take up no more than 1/3 of your picture, and be well-lit enough to read.
+- Currently does not work with non-URL payloads
