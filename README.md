@@ -1,5 +1,5 @@
 # FingerQRCode
-![Screenshot](https://github.com/dfgHiatus/MatrixUtils/blob/master/Screenshot.PNG)
+![Screenshot](https://github.com/dfgHiatus/FingerQRCode/blob/master/QRCode.PNG)
 A mod to extend QR Code reader functionality to NeosVR's finger photo gesture
 
 ## Installation
